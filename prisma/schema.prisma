@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Member {
+  id        Int      @id @default(autoincrement())
+  memberId  String   @unique
+  name      String
+  email     String   @default("")
+  phone     String   @default("")
+  address   String   @default("")
+  avatar    String   @default("")
+  canSpend  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id         Int      @id @default(autoincrement())
+  txId       String   @unique
+  timestamp  DateTime @default(now())
+  memberName String
+  income     Float    @default(0)
+  expense    Float    @default(0)
+  note       String   @default("")
+  slipUrl    String   @default("")
+  createdAt  DateTime @default(now())
+}
