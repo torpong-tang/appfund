@@ -200,7 +200,7 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="app-container min-h-screen p-6 md:p-10 font-sans text-slate-800">
+    <div className="app-container min-h-screen p-6 md:p-10 font-sans text-white bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-violet-900 via-violet-950 to-indigo-950">
       {/* Toast */}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
@@ -294,21 +294,21 @@ export default function Dashboard() {
       <Modal isOpen={modals.receive} onClose={() => toggleModal('receive', false)} title="บันทึกรับเงินโอน">
         <div className="flex flex-col gap-4">
           <select
-            className="w-full p-3 rounded-xl border border-indigo-200 bg-white"
+            className="w-full p-3 rounded-xl border border-white/20 glass-input"
             value={formData.memberId}
             onChange={e => setFormData({ ...formData, memberId: e.target.value })}
           >
-            <option value="">เลือกสมาชิก...</option>
-            {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+            <option value="" className="bg-indigo-950 text-white">เลือกสมาชิก...</option>
+            {members.map(m => <option key={m.id} value={m.id} className="bg-indigo-950 text-white">{m.name}</option>)}
           </select>
           <input
             type="number"
             placeholder="จำนวนเงิน (บาท)"
-            className="w-full p-4 text-2xl font-black text-right text-emerald-600 border border-indigo-200 rounded-xl bg-white"
+            className="w-full p-4 text-2xl font-black text-right text-emerald-400 border border-white/20 rounded-xl glass-input"
             value={formData.amount}
             onChange={e => setFormData({ ...formData, amount: e.target.value })}
           />
-          <div className="border-2 border-dashed border-indigo-200 p-4 rounded-xl text-center bg-indigo-50/50 cursor-pointer relative">
+          <div className="border-2 border-dashed border-white/20 p-4 rounded-xl text-center bg-white/5 cursor-pointer relative">
             <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleFileChange} />
             {formData.slip ? (
               <img src={formData.slip} className="h-40 mx-auto object-contain" alt="Slip" />
@@ -319,7 +319,7 @@ export default function Dashboard() {
           <textarea
             placeholder="หมายเหตุ..."
             rows="2"
-            className="w-full p-3 rounded-xl border border-indigo-200 bg-white"
+            className="w-full p-3 rounded-xl border border-white/20 glass-input"
             value={formData.note}
             onChange={e => setFormData({ ...formData, note: e.target.value })}
           />
@@ -331,21 +331,21 @@ export default function Dashboard() {
       <Modal isOpen={modals.spend} onClose={() => toggleModal('spend', false)} title="บันทึกรายการจ่ายเงิน">
         <div className="flex flex-col gap-4">
           <select
-            className="w-full p-3 rounded-xl border border-indigo-200 bg-white"
+            className="w-full p-3 rounded-xl border border-white/20 glass-input"
             value={formData.memberId}
             onChange={e => setFormData({ ...formData, memberId: e.target.value })}
           >
-            <option value="">เลือกผู้ทำรายการ...</option>
-            {members.filter(m => m.canSpend).map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+            <option value="" className="bg-indigo-950 text-white">เลือกผู้ทำรายการ...</option>
+            {members.filter(m => m.canSpend).map(m => <option key={m.id} value={m.id} className="bg-indigo-950 text-white">{m.name}</option>)}
           </select>
           <input
             type="number"
             placeholder="จำนวนเงิน (บาท)"
-            className="w-full p-4 text-2xl font-black text-right text-red-600 border border-indigo-200 rounded-xl bg-white"
+            className="w-full p-4 text-2xl font-black text-right text-red-400 border border-white/20 rounded-xl glass-input"
             value={formData.amount}
             onChange={e => setFormData({ ...formData, amount: e.target.value })}
           />
-          <div className="border-2 border-dashed border-indigo-200 p-4 rounded-xl text-center bg-indigo-50/50 cursor-pointer relative">
+          <div className="border-2 border-dashed border-white/20 p-4 rounded-xl text-center bg-white/5 cursor-pointer relative">
             <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleFileChange} />
             {formData.slip ? (
               <img src={formData.slip} className="h-40 mx-auto object-contain" alt="Slip" />
@@ -356,7 +356,7 @@ export default function Dashboard() {
           <textarea
             placeholder="หมายเหตุ..."
             rows="2"
-            className="w-full p-3 rounded-xl border border-indigo-200 bg-white"
+            className="w-full p-3 rounded-xl border border-white/20 glass-input"
             value={formData.note}
             onChange={e => setFormData({ ...formData, note: e.target.value })}
           />
@@ -370,13 +370,13 @@ export default function Dashboard() {
           <input
             type="text"
             placeholder="ค้นหารายการ..."
-            className="w-full p-3 mb-4 border border-indigo-200 rounded-xl"
+            className="w-full p-3 mb-4 border border-white/20 rounded-xl glass-input"
             value={filters.reportSearch}
             onChange={e => setFilters({ ...filters, reportSearch: e.target.value })}
           />
-          <div className="flex-1 overflow-auto border rounded-xl">
+          <div className="flex-1 overflow-auto border border-white/10 rounded-xl custom-scrollbar">
             <table className="w-full text-left text-sm">
-              <thead className="bg-indigo-900 text-white sticky top-0">
+              <thead className="bg-violet-900 text-white sticky top-0 shadow-md">
                 <tr>
                   <th className="p-3">วันที่/เวลา</th>
                   <th className="p-3">สมาชิก</th>
@@ -385,16 +385,16 @@ export default function Dashboard() {
                   <th className="p-3 text-center">หลักฐาน</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-white/10">
                 {filteredTransactions.map(tx => (
-                  <tr key={tx.id} className="hover:bg-orange-50 cursor-pointer transition-colors" onClick={() => { setSlipData(tx); toggleModal('slip', true); }}>
+                  <tr key={tx.id} className="hover:bg-white/5 cursor-pointer transition-colors border-b border-white/5" onClick={() => { setSlipData(tx); toggleModal('slip', true); }}>
                     <td className="p-3">
                       {new Date(tx.timestamp).toLocaleDateString('th-TH')} <br />
                       <span className="text-xs text-slate-400">{new Date(tx.timestamp).toLocaleTimeString('th-TH')}</span>
                     </td>
                     <td className="p-3 font-bold">{tx.memberName}</td>
-                    <td className="p-3 text-right font-bold text-emerald-600">{tx.income > 0 ? tx.income.toLocaleString() : '-'}</td>
-                    <td className="p-3 text-right font-bold text-red-600">{tx.expense > 0 ? tx.expense.toLocaleString() : '-'}</td>
+                    <td className="p-3 text-right font-bold text-emerald-400">{tx.income > 0 ? tx.income.toLocaleString() : '-'}</td>
+                    <td className="p-3 text-right font-bold text-red-400">{tx.expense > 0 ? tx.expense.toLocaleString() : '-'}</td>
                     <td className="p-3 text-center"><i className="fas fa-eye text-indigo-400"></i></td>
                   </tr>
                 ))}
@@ -408,7 +408,7 @@ export default function Dashboard() {
       <Modal isOpen={modals.slip} onClose={() => toggleModal('slip', false)} title="รายละเอียดหลักฐาน" maxWidth="max-w-4xl">
         {slipData && (
           <div className="text-center">
-            <div className="bg-indigo-50 p-4 rounded-xl mb-4 text-left border-l-4 border-indigo-500">
+            <div className="bg-indigo-900/30 p-4 rounded-xl mb-4 text-left border-l-4 border-indigo-500 text-white">
               <p><span className="font-bold">รหัสรายการ:</span> {slipData.txId}</p>
               <p><span className="font-bold">หมายเหตุ:</span> {slipData.note}</p>
             </div>
@@ -427,7 +427,7 @@ export default function Dashboard() {
       {/* Delete Confirmation */}
       <Modal isOpen={modals.deleteConfirm} onClose={() => toggleModal('deleteConfirm', false)} title="ยืนยันการลบ" maxWidth="max-w-md">
         <div className="text-center">
-          <p className="text-red-500 mb-6">คุณแน่ใจหรือไม่ที่จะลบรายการนี้?</p>
+          <p className="text-red-400 mb-6">คุณแน่ใจหรือไม่ที่จะลบรายการนี้?</p>
           <button onClick={() => { toggleModal('deleteConfirm', false); toggleModal('deleteCode', true); }} className="px-8 py-3 bg-red-600 text-white rounded-xl font-bold">ยืนยัน</button>
         </div>
       </Modal>
@@ -435,19 +435,19 @@ export default function Dashboard() {
       {/* Delete Code */}
       <Modal isOpen={modals.deleteCode} onClose={() => toggleModal('deleteCode', false)} title="รหัสผ่าน (1234)" maxWidth="max-w-sm">
         <div className="text-center">
-          <input type="password" id="del_pass_input" className="w-full text-center text-4xl p-4 border rounded-xl mb-6 tracking-widest font-mono" maxLength={4} />
+          <input type="password" id="del_pass_input" className="w-full text-center text-4xl p-4 border border-white/20 rounded-xl mb-6 tracking-widest font-mono glass-input" maxLength={4} />
           <button onClick={confirmDelete} className="w-full py-3 bg-slate-800 text-white rounded-xl font-bold">ยืนยัน</button>
         </div>
       </Modal>
 
       {/* Income Detail Modal */}
       <Modal isOpen={modals.incomeDetail} onClose={() => toggleModal('incomeDetail', false)} title="วิเคราะห์รายรับ" maxWidth="max-w-5xl">
-        <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 mb-8">
+        <div className="p-6 bg-white/5 rounded-3xl border border-white/10 mb-8">
           <div className="flex justify-between mb-2">
-            <span className="font-bold text-slate-500">ความคืบหน้า</span>
-            <span className="font-black text-indigo-600">{incomePercent}%</span>
+            <span className="font-bold text-slate-300">ความคืบหน้า</span>
+            <span className="font-black text-indigo-400">{incomePercent}%</span>
           </div>
-          <div className="w-full bg-slate-200 h-4 rounded-full overflow-hidden">
+          <div className="w-full bg-white/10 h-4 rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-emerald-400 to-indigo-600 transition-all duration-1000" style={{ width: `${incomePercent}%` }}></div>
           </div>
         </div>
@@ -457,7 +457,7 @@ export default function Dashboard() {
             <div
               key={tier}
               onClick={() => { setFilters({ ...filters, breakdownTier: tier }); toggleModal('breakdown', true); toggleModal('incomeDetail', false); }}
-              className={`p-6 rounded-3xl shadow-xl cursor-pointer hover:scale-105 transition border-2 ${tier === 'admin' ? 'bg-white border-slate-200' : tier === 'bronze' ? 'bg-[#CD7F32] text-white border-[#CD7F32]' : tier === 'silver' ? 'bg-[#C0C0C0] text-slate-800 border-[#C0C0C0]' : 'bg-[#FFD700] text-slate-800 border-[#FFD700]'}`}
+              className={`p-6 rounded-3xl shadow-xl cursor-pointer hover:scale-105 transition border-2 ${tier === 'admin' ? 'bg-white/10 text-white border-white/20' : tier === 'bronze' ? 'bg-[#CD7F32]/20 text-[#CD7F32] border-[#CD7F32]/50' : tier === 'silver' ? 'bg-[#C0C0C0]/20 text-[#C0C0C0] border-[#C0C0C0]/50' : 'bg-[#FFD700]/20 text-[#FFD700] border-[#FFD700]/50'}`}
             >
               <div className="font-black uppercase text-xs mb-2">{tier}</div>
               <div className="text-2xl font-black">คลิกดู</div>
@@ -471,7 +471,7 @@ export default function Dashboard() {
         <input
           type="text"
           placeholder="ค้นหาชื่อ..."
-          className="w-full p-3 mb-4 border rounded-xl"
+          className="w-full p-3 mb-4 border border-white/20 rounded-xl glass-input"
           value={filters.breakdownSearch}
           onChange={e => setFilters({ ...filters, breakdownSearch: e.target.value })}
         />
@@ -479,9 +479,9 @@ export default function Dashboard() {
           <table className="w-full">
             <tbody>
               {breakdownData.map((m, i) => (
-                <tr key={i} className="border-b">
+                <tr key={i} className="border-b border-white/10">
                   <td className="p-3 font-bold">{m.name}</td>
-                  <td className="p-3 text-right font-bold text-emerald-600">{m.total.toLocaleString()}</td>
+                  <td className="p-3 text-right font-bold text-emerald-400">{m.total.toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -491,14 +491,14 @@ export default function Dashboard() {
 
       {/* AI Modal */}
       <Modal isOpen={modals.ai} onClose={() => toggleModal('ai', false)} title="AI Analysis (Gemini 2.5)" maxWidth="max-w-4xl">
-        <div className="bg-slate-50 p-6 rounded-2xl border border-indigo-100 min-h-[300px] overflow-y-auto">
+        <div className="bg-white/5 p-6 rounded-2xl border border-white/10 min-h-[300px] overflow-y-auto custom-scrollbar">
           {aiLoading ? (
             <div className="flex flex-col items-center justify-center h-48 opacity-50">
               <i className="fas fa-circle-notch fa-spin text-4xl mb-4 text-indigo-500"></i>
-              <p className="animate-pulse text-indigo-800 font-bold">Gemini กำลังวิเคราะห์ข้อมูลการเงินให้คุณ...</p>
+              <p className="animate-pulse text-indigo-300 font-bold">Gemini กำลังวิเคราะห์ข้อมูลการเงินให้คุณ...</p>
             </div>
           ) : (
-            <div className="prose prose-indigo max-w-none text-slate-700 leading-relaxed font-medium">
+            <div className="prose prose-invert prose-indigo max-w-none text-slate-200 leading-relaxed font-medium">
               {aiResponse ? (
                 <div dangerouslySetInnerHTML={{ __html: aiResponse.replace(/\n/g, '<br>') }} />
               ) : (

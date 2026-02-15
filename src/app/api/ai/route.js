@@ -1,10 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-
-const prisma = new PrismaClient();
 
 export async function POST(req) {
     try {
@@ -28,7 +26,7 @@ export async function POST(req) {
         const summary = transactions
             .map(
                 (t) =>
-                    `${t.timestamp.toISOString().split("T")[0]}: ${t.member} - ${t.income > 0 ? `Income ${t.income}` : `Expense ${t.expense}`
+                    `${t.timestamp.toISOString().split("T")[0]}: ${t.memberName} - ${t.income > 0 ? `Income ${t.income}` : `Expense ${t.expense}`
                     } (${t.note})`
             )
             .join("\n");

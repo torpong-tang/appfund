@@ -209,7 +209,7 @@ export default function MembersPage() {
 
             {/* Edit Modal */}
             <Modal isOpen={isModalOpen} onClose={closeModal} title={editingMember ? "แก้ไขข้อมูลศิษย์เก่า" : "เพิ่มศิษย์เก่าใหม่"}>
-                <form onSubmit={handleSubmit} className="space-y-4 font-sarabun text-slate-800 dark:text-white">
+                <form onSubmit={handleSubmit} className="space-y-4 font-sarabun text-white">
                     {/* Avatar Upload */}
                     <div className="flex flex-col items-center justify-center mb-6">
                         <div className="relative group cursor-pointer w-28 h-28">
@@ -225,24 +225,24 @@ export default function MembersPage() {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs opacity-60 mb-1">รหัสนักศึกษา</label>
-                            <input required type="text" disabled={!!editingMember} value={formData.memberId} onChange={e => setFormData({ ...formData, memberId: e.target.value })} className="glass-input w-full p-2.5 rounded-xl text-black" placeholder="6XXXXXX" />
+                            <input required type="text" disabled={!!editingMember} value={formData.memberId} onChange={e => setFormData({ ...formData, memberId: e.target.value })} className="glass-input w-full p-2.5 rounded-xl" placeholder="6XXXXXX" />
                         </div>
                         <div>
                             <label className="block text-xs opacity-60 mb-1">เบอร์โทรศัพท์</label>
-                            <input type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="glass-input w-full p-2.5 rounded-xl text-black" placeholder="0xx-xxx-xxxx" />
+                            <input type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="glass-input w-full p-2.5 rounded-xl" placeholder="0xx-xxx-xxxx" />
                         </div>
                     </div>
                     <div>
                         <label className="block text-xs opacity-60 mb-1">ชื่อ-นามสกุล</label>
-                        <input required type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="glass-input w-full p-2.5 rounded-xl text-black" />
+                        <input required type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="glass-input w-full p-2.5 rounded-xl" />
                     </div>
                     <div>
                         <label className="block text-xs opacity-60 mb-1">อีเมล</label>
-                        <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="glass-input w-full p-2.5 rounded-xl text-black" />
+                        <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="glass-input w-full p-2.5 rounded-xl" />
                     </div>
                     <div>
                         <label className="block text-xs opacity-60 mb-1">ที่อยู่</label>
-                        <textarea rows="3" value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} className="glass-input w-full p-2.5 rounded-xl text-black"></textarea>
+                        <textarea rows="3" value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} className="glass-input w-full p-2.5 rounded-xl"></textarea>
                     </div>
 
                     <div className="pt-4 flex gap-3">
@@ -256,7 +256,7 @@ export default function MembersPage() {
             <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="ยืนยันการลบ">
                 <div className="text-center p-4">
                     <AlertTriangle size={48} className="mx-auto text-red-500 mb-4" />
-                    <p className="text-lg mb-6 text-slate-800 dark:text-white">คุณแน่ใจหรือไม่ที่จะลบข้อมูลของ "{memberToDelete?.name}"?</p>
+                    <p className="text-lg mb-6 text-white">คุณแน่ใจหรือไม่ที่จะลบข้อมูลของ "{memberToDelete?.name}"?</p>
                     <div className="flex gap-4">
                         <button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 py-3 bg-slate-700 text-white rounded-xl">ยกเลิก</button>
                         <button onClick={confirmDelete} className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold">ลบข้อมูล</button>
