@@ -21,8 +21,8 @@ const FONT_CSS =
   "body,button,input,select,textarea{font-family:'Prompt',system-ui,sans-serif;}";
 
 export const metadata = {
-  title: "เป๋าเรา Acc BA 34 - Full AI & Original Features (V11)",
-  description: "ระบบจัดการเงินรุ่นและทำเนียบศิษย์เก่า",
+  title: "AppFund | 2Startup Cloud",
+  description: "ระบบติดตามกองทุนส่วนกลาง รายรับ รายจ่าย ผู้ร่วมสมทบ และเป้าหมายเงินสะสม",
 };
 
 export default function RootLayout({ children }) {
