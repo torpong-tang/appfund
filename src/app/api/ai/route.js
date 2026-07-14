@@ -3,8 +3,10 @@ export const dynamic = "force-dynamic";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { getSessionUser } from "@/lib/auth";
 
 export async function POST(req) {
+    if (!getSessionUser(req)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
     try {
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {

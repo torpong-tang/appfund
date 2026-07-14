@@ -1,13 +1,17 @@
 
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, UserPlus, Users, MapPin, Globe, Loader, ArrowLeft, Camera, Upload, Hash, CreditCard, Phone, Smartphone, User, Mail, AtSign, Home, XCircle, Save, AlertTriangle } from 'lucide-react';
+import { Search, UserPlus, Users, Loader, ArrowLeft, Camera, Upload, AlertTriangle } from 'lucide-react';
 import Modal from '@/components/Modal';
 import MemberCard from '@/components/MemberCard';
 import Toast from '@/components/Toast';
+import { api, apiJson } from '@/lib/api';
 
 export default function MembersPage() {
+    const router = useRouter();
+    const [authChecked, setAuthChecked] = useState(false);
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -27,9 +31,7 @@ export default function MembersPage() {
     const fetchMembers = async () => {
         try {
             setLoading(true);
-            const res = await fetch('/api/members');
-            const data = await res.json();
-            setMembers(data);
+            setMembers(await apiJson('/api/members'));
         } catch (e) {
             console.error(e);
             setToast({ message: "Failed to load members", type: "error" });
@@ -41,6 +43,19 @@ export default function MembersPage() {
     useEffect(() => {
         fetchMembers();
     }, []);
+
+    // --- Auth guard: admin only ---
+    useEffect(() => {
+        let active = true;
+        apiJson('/api/auth/me')
+            .then(d => {
+                if (!active) return;
+                if (d && d.user) setAuthChecked(true);
+                else router.replace('/login');
+            })
+            .catch(() => { if (active) router.replace('/login'); });
+        return () => { active = false; };
+    }, [router]);
 
     // --- Handlers ---
     const handleFileChange = (e) => {
@@ -58,7 +73,7 @@ export default function MembersPage() {
         e.preventDefault();
         try {
             const method = editingMember ? 'PUT' : 'POST';
-            const url = editingMember ? `/api/members/${editingMember.id}` : '/api/members';
+            const url = editingMember ? api(`/api/members/${editingMember.id}`) : api('/api/members');
 
             const res = await fetch(url, {
                 method,
@@ -79,7 +94,7 @@ export default function MembersPage() {
     const confirmDelete = async () => {
         if (memberToDelete) {
             try {
-                await fetch(`/api/members/${memberToDelete.id}`, { method: 'DELETE' });
+                await fetch(api(`/api/members/${memberToDelete.id}`), { method: 'DELETE' });
                 setToast({ message: "ลบสมาชิกสำเร็จ", type: "success" });
                 setMemberToDelete(null);
                 setIsDeleteModalOpen(false);
@@ -124,11 +139,17 @@ export default function MembersPage() {
 
     const stats = useMemo(() => {
         return {
-            total: members.length,
-            bangkok: members.filter(m => m.address && m.address.includes("กทม")).length,
-            others: members.length - members.filter(m => m.address && m.address.includes("กทม")).length
+            total: members.length
         };
     }, [members]);
+
+    if (!authChecked) {
+        return (
+            <div className="min-h-screen flex items-center justify-center text-white/70">
+                <Loader className="animate-spin" size={40} />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen p-4 md:p-8 lg:p-12 relative z-10 ambient-light text-white font-sarabun">
@@ -158,18 +179,10 @@ export default function MembersPage() {
             </div>
 
             {/* Stats */}
-            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 relative z-20">
-                <div className="glass-dark-panel rounded-2xl p-6 flex items-center gap-4">
+            <div className="max-w-7xl mx-auto mb-12 relative z-20">
+                <div className="glass-dark-panel rounded-2xl p-6 flex items-center gap-4 w-full sm:w-auto sm:inline-flex">
                     <div className="p-3 rounded-xl bg-blue-500/20 text-blue-200"><Users size={24} /></div>
                     <div><p className="text-white/40 text-sm">ศิษย์เก่าในระบบ</p><p className="text-2xl font-bold">{stats.total} คน</p></div>
-                </div>
-                <div className="glass-dark-panel rounded-2xl p-6 flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-green-500/20 text-green-200"><MapPin size={24} /></div>
-                    <div><p className="text-white/40 text-sm">พื้นที่ กทม.</p><p className="text-2xl font-bold">{stats.bangkok} คน</p></div>
-                </div>
-                <div className="glass-dark-panel rounded-2xl p-6 flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-amber-500/20 text-amber-200"><Globe size={24} /></div>
-                    <div><p className="text-white/40 text-sm">ต่างจังหวัด/อื่นๆ</p><p className="text-2xl font-bold">{stats.others} คน</p></div>
                 </div>
             </div>
 
@@ -246,8 +259,8 @@ export default function MembersPage() {
                     </div>
 
                     <div className="pt-4 flex gap-3">
-                        <button type="button" onClick={closeModal} className="flex-1 py-3 rounded-xl bg-slate-700 text-white">ยกเลิก</button>
-                        <button type="submit" className="flex-1 py-3 rounded-xl bg-teal-600 text-white font-bold">บันทึก</button>
+                        <button type="button" onClick={closeModal} className="cursor-pointer glow-slate flex-1 py-3 rounded-xl bg-slate-700 text-white transition-all duration-300 flex items-center justify-center gap-2"><i className="fas fa-xmark"></i> ยกเลิก</button>
+                        <button type="submit" className="cursor-pointer glow-teal flex-1 py-3 rounded-xl bg-teal-600 text-white font-bold transition-all duration-300 flex items-center justify-center gap-2"><i className="fas fa-floppy-disk"></i> บันทึก</button>
                     </div>
                 </form>
             </Modal>
@@ -256,10 +269,10 @@ export default function MembersPage() {
             <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="ยืนยันการลบ">
                 <div className="text-center p-4">
                     <AlertTriangle size={48} className="mx-auto text-red-500 mb-4" />
-                    <p className="text-lg mb-6 text-white">คุณแน่ใจหรือไม่ที่จะลบข้อมูลของ "{memberToDelete?.name}"?</p>
+                    <p className="text-lg mb-6 text-white">คุณแน่ใจหรือไม่ที่จะลบข้อมูลของ &quot;{memberToDelete?.name}&quot;?</p>
                     <div className="flex gap-4">
-                        <button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 py-3 bg-slate-700 text-white rounded-xl">ยกเลิก</button>
-                        <button onClick={confirmDelete} className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold">ลบข้อมูล</button>
+                        <button onClick={() => setIsDeleteModalOpen(false)} className="cursor-pointer glow-slate flex-1 py-3 bg-slate-700 text-white rounded-xl transition-all duration-300 flex items-center justify-center gap-2"><i className="fas fa-xmark"></i> ยกเลิก</button>
+                        <button onClick={confirmDelete} className="cursor-pointer glow-rose flex-1 py-3 bg-red-600 text-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2"><i className="fas fa-trash"></i> ลบข้อมูล</button>
                     </div>
                 </div>
             </Modal>

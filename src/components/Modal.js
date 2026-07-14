@@ -1,22 +1,16 @@
 
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 export default function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-2xl", className = "" }) {
-    const [show, setShow] = useState(false);
-
     useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = "hidden";
-            setShow(true);
-        } else {
+        document.body.style.overflow = isOpen ? "hidden" : "unset";
+        return () => {
             document.body.style.overflow = "unset";
-            const timer = setTimeout(() => setShow(false), 200);
-            return () => clearTimeout(timer);
-        }
+        };
     }, [isOpen]);
 
-    if (!isOpen && !show) return null;
+    if (!isOpen) return null;
 
     return (
         <div className={`modal-backdrop fixed inset-0 z-[9990] flex items-center justify-center p-4 transition-opacity duration-200 ${isOpen ? "opacity-100" : "opacity-0"}`}>

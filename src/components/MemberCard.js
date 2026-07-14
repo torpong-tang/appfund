@@ -58,10 +58,10 @@ export default function MemberCard({ member, onEdit, onDelete }) {
             </div>
 
             <div className="mt-4 pt-0 flex justify-end items-center relative z-10 gap-2">
-                <button onClick={() => onEdit(member)} className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-teal-200 transition-all flex items-center justify-center gap-2 text-xs font-medium border border-white/5 hover:border-teal-500/30 hover:shadow-[0_0_15px_rgba(45,212,191,0.1)]">
+                <button onClick={() => onEdit(member)} className="cursor-pointer glow-teal flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-teal-200 transition-all duration-300 flex items-center justify-center gap-2 text-xs font-medium border border-white/5 hover:border-teal-500/30">
                     <Pencil size={14} /> แก้ไข
                 </button>
-                <button onClick={() => onDelete(member)} className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-red-500/20 text-red-300 transition-all flex items-center justify-center gap-2 text-xs font-medium border border-white/5 hover:border-red-500/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                <button onClick={() => onDelete(member)} className="cursor-pointer glow-rose flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-red-500/20 text-red-300 transition-all duration-300 flex items-center justify-center gap-2 text-xs font-medium border border-white/5 hover:border-red-500/30">
                     <Trash2 size={14} /> ลบ
                 </button>
             </div>

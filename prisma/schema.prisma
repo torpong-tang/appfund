@@ -30,5 +30,27 @@ model Transaction {
   expense    Float    @default(0)
   note       String   @default("")
   slipUrl    String   @default("")
+  recordedBy String   @default("")
   createdAt  DateTime @default(now())
+}
+
+// Admin accounts allowed to log into the app.
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String   @default("")
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// App-wide configurable labels. Singleton row (id = 1).
+model Setting {
+  id            Int      @id @default(autoincrement())
+  title         String   @default("เป๋าเรา Acc BA 34")
+  subtitle      String   @default("")
+  bankName      String   @default("กรุงเทพฯ (BBL)")
+  accountNumber String   @default("123-4-56789-0")
+  incomeTarget  Float    @default(500000)
+  updatedAt     DateTime @updatedAt
 }

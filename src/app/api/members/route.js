@@ -2,8 +2,10 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getSessionUser } from '@/lib/auth';
 
 export async function GET(request) {
+    if (!getSessionUser(request)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
 
@@ -26,6 +28,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+    if (!getSessionUser(request)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
     try {
         const json = await request.json();
         const member = await prisma.member.create({
