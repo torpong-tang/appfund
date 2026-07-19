@@ -134,8 +134,9 @@ cd /home/johnson/projects/appfund
 ./scripts/deploy-production.sh
 ```
 
-The script requires an already-loaded SSH agent, checks the production `.env`
-permission, backs up SQLite with a checksum, refuses a dirty production
+The script requires an already-loaded SSH agent, loads `.env.production` (or
+falls back to `.env`) only when its permission is `600`, backs up SQLite with a
+checksum, refuses a dirty production
 worktree, pulls with `--ff-only`, runs tests/build/runtime smoke checks, and
 restarts only the `appfund` PM2 process.
 

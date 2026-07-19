@@ -20,8 +20,15 @@ DATA_DIR="/var/lib/2startup/appfund"
 DB_PATH="$DATA_DIR/appfund.db"
 
 cd "$APP_DIR"
-test -f .env
-test "$(stat -c %a .env)" = "600"
+if [[ -f .env.production ]]; then
+  env_file=".env.production"
+elif [[ -f .env ]]; then
+  env_file=".env"
+else
+  echo "No production environment file was found." >&2
+  exit 1
+fi
+test "$(stat -c %a "$env_file")" = "600"
 test -f "$DB_PATH"
 
 mkdir -p "$DATA_DIR/backups"
@@ -44,7 +51,7 @@ echo "Deploying commit: $(git rev-parse --short HEAD)"
 npm ci --include=dev
 set -a
 # shellcheck disable=SC1091
-source ./.env
+source "./$env_file"
 set +a
 export DATABASE_URL="file:$DB_PATH"
 export NEXT_PUBLIC_BASE_PATH="/appfund"
