@@ -70,6 +70,10 @@ npm run lint
 NEXT_PUBLIC_BASE_PATH=/appfund npm run build
 ```
 
+The `postbuild` script automatically copies `.next/static` and `public` into
+`.next/standalone`. These assets are required when PM2 runs the standalone
+server; do not remove this step from the production build.
+
 Known lint warnings may appear for existing `<img>` usage. Treat new warnings as issues unless intentionally reviewed.
 
 ## Production Routing
@@ -115,6 +119,14 @@ NODE_ENV=production PORT=3011 HOSTNAME=127.0.0.1 DATABASE_URL="file:/var/lib/2st
 pm2 save
 ```
 
+Verify that standalone assets were prepared before restarting PM2:
+
+```bash
+test -f .next/standalone/server.js
+test -d .next/standalone/.next/static
+test -d .next/standalone/public
+```
+
 If PM2 must be recreated:
 
 ```bash
@@ -128,6 +140,8 @@ pm2 save
 curl -I -s https://2startup.cloud/ | head -n 1
 curl -I -s https://2startup.cloud/appfund | head -n 5
 curl -I -s https://2startup.cloud/appfund/login | head -n 1
+asset_path=$(curl -s https://2startup.cloud/appfund/login | grep -oE '/appfund/_next/static/[^" ]+' | head -n 1)
+curl -I -s "https://2startup.cloud${asset_path}" | head -n 2
 curl -I -s https://2startup.cloud/appfund/members | head -n 5
 pm2 ls
 ```
@@ -137,6 +151,7 @@ Expected:
 - `https://2startup.cloud/` returns `200 OK`
 - `https://2startup.cloud/appfund` redirects to `/appfund/login`
 - `https://2startup.cloud/appfund/login` returns `200 OK`
+- the sampled `/_next/static/` asset returns `200 OK` with a JavaScript or CSS content type
 - protected routes without a session redirect to `/appfund/login`
 - PM2 process `appfund` is `online`
 
