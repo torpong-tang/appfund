@@ -85,13 +85,9 @@ AppFund runs behind Nginx and PM2:
 - Internal target: `http://127.0.0.1:3011`
 - PM2 process: `appfund`
 
-Nginx should keep an exact redirect for the bare app path:
+Nginx must proxy the bare app path and all nested routes to AppFund:
 
 ```nginx
-location = /appfund {
-    return 302 /appfund/login;
-}
-
 location ^~ /appfund {
     proxy_pass http://127.0.0.1:3011;
     proxy_http_version 1.1;
@@ -102,7 +98,13 @@ location ^~ /appfund {
 }
 ```
 
-The application also has a server-side route guard in `src/proxy.js`. Protected routes redirect to `/appfund/login` when the `appfund_session` cookie is missing or invalid.
+Do not add an exact `location = /appfund` redirect in Nginx. The authenticated
+dashboard also uses `/appfund`, so an unconditional Nginx redirect creates a
+login loop after the login API succeeds.
+
+The application has a server-side route guard in `src/proxy.js`. It redirects
+unauthenticated requests to `/appfund/login` and allows an authenticated request
+to render the dashboard at `/appfund`.
 
 ## Production Deploy
 
@@ -149,7 +151,8 @@ pm2 ls
 Expected:
 
 - `https://2startup.cloud/` returns `200 OK`
-- `https://2startup.cloud/appfund` redirects to `/appfund/login`
+- `https://2startup.cloud/appfund` redirects to `/appfund/login` without a session
+- `https://2startup.cloud/appfund` returns the dashboard with a valid session
 - `https://2startup.cloud/appfund/login` returns `200 OK`
 - the sampled `/_next/static/` asset returns `200 OK` with a JavaScript or CSS content type
 - protected routes without a session redirect to `/appfund/login`

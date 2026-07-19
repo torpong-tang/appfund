@@ -78,17 +78,34 @@ export default function LandingPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15000);
     try {
       const res = await fetch(api('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
+        credentials: 'same-origin',
+        cache: 'no-store',
+        signal: controller.signal,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'เข้าสู่ระบบไม่สำเร็จ');
-      router.replace('/');
+
+      const sessionRes = await fetch(api('/api/auth/me'), {
+        credentials: 'same-origin',
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+      if (!sessionRes.ok) {
+        throw new Error('สร้าง session ไม่สำเร็จ กรุณาลองเข้าสู่ระบบอีกครั้ง');
+      }
+
+      window.location.assign(api(''));
     } catch (err) {
-      setError(err.message);
+      setError(err.name === 'AbortError' ? 'ระบบใช้เวลาตอบสนองนานเกินไป กรุณาลองอีกครั้ง' : err.message);
+    } finally {
+      window.clearTimeout(timeout);
       setLoading(false);
     }
   };
