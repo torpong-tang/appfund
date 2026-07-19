@@ -313,10 +313,10 @@ export default function Dashboard() {
       {/* Toast */}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-      {/* Top-right toolbar: current user + admin management + settings */}
+      {/* Top-right toolbar: admin management + settings + current user */}
       <div className="fixed top-5 right-5 z-50 flex items-center gap-3">
         {/* Current user chip + dropdown */}
-        <div className="relative">
+        <div className="relative order-3">
           <button
             onClick={() => setUserMenuOpen(o => !o)}
             className="cursor-pointer flex items-center gap-2 pl-3 pr-3 py-2 rounded-full text-white/90 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg hover:bg-white/20 transition-all"
@@ -357,7 +357,7 @@ export default function Dashboard() {
           onClick={() => toggleModal('admins', true)}
           aria-label="จัดการผู้ดูแล"
           title="จัดการผู้ดูแล"
-          className="cursor-pointer w-12 h-12 rounded-full flex items-center justify-center text-white/90 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-300"
+          className="order-1 cursor-pointer w-12 h-12 rounded-full flex items-center justify-center text-white/90 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-300"
         >
           <i className="fas fa-users text-lg"></i>
         </button>
@@ -367,7 +367,7 @@ export default function Dashboard() {
           onClick={openSettings}
           aria-label="ตั้งค่า"
           title="ตั้งค่า"
-          className="cursor-pointer w-12 h-12 rounded-full flex items-center justify-center text-white/90 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg hover:bg-white/20 hover:rotate-90 transition-all duration-300"
+          className="order-2 cursor-pointer w-12 h-12 rounded-full flex items-center justify-center text-white/90 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg hover:bg-white/20 hover:rotate-90 transition-all duration-300"
         >
           <i className="fas fa-gear text-xl"></i>
         </button>
