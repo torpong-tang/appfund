@@ -93,7 +93,7 @@ export default function LandingPage() {
     }
   };
 
-  const s = summary || { balance: 0, remaining: 0, target: 0, percent: 0, title: 'เป๋าเรา Acc BA 34', subtitle: '', latestTimestamp: null, contributors: [] };
+  const s = summary || { balance: 0, remaining: 0, target: 0, percent: 0, title: 'AppFund', subtitle: '', latestTimestamp: null, contributors: [] };
   const latest = s.latestTimestamp ? new Date(s.latestTimestamp) : null;
 
   return (
@@ -162,6 +162,9 @@ export default function LandingPage() {
           <div className="mb-6">
             <h2 className="text-2xl font-black tracking-tight">เข้าสู่ระบบผู้ดูแล</h2>
             <p className="text-sm text-slate-300/70 mt-1">สำหรับผู้ดูแลระบบ (Admin) เท่านั้น</p>
+            <p className="mt-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-emerald-100/90">
+              Admin: torpong.t@gmail.com / Password: ใช้รหัสที่กำหนดใน production
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -172,7 +175,7 @@ export default function LandingPage() {
                 <input
                   type="email" required autoFocus
                   className="glass-input w-full pl-10 pr-4 py-3 rounded-xl"
-                  placeholder="admin@appfund.com"
+                  placeholder="torpong.t@gmail.com"
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
                 />
