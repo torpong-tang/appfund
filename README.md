@@ -127,6 +127,20 @@ to render the dashboard at `/appfund`.
 
 ## Production Deploy
 
+Preferred deployment command from the trusted WSL workstation:
+
+```bash
+cd /home/johnson/projects/appfund
+./scripts/deploy-production.sh
+```
+
+The script requires an already-loaded SSH agent, checks the production `.env`
+permission, backs up SQLite with a checksum, refuses a dirty production
+worktree, pulls with `--ff-only`, runs tests/build/runtime smoke checks, and
+restarts only the `appfund` PM2 process.
+
+Equivalent manual commands:
+
 ```bash
 ssh -A root@72.62.247.131
 cd /var/www/apps/appfund
