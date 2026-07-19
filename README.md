@@ -1,36 +1,149 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# AppFund
 
-## Getting Started
+AppFund is the shared fund dashboard for 2Startup Cloud. It tracks members, income, expenses, goals, and admin-managed fund settings under the `/appfund` base path.
 
-First, run the development server:
+## Stack
+
+- Next.js 16
+- React 19
+- Prisma
+- SQLite
+- PM2 standalone deployment
+
+## Local Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd /home/johnson/projects/appfund
+npm install
+npx prisma generate
+npm run dev -- -H 0.0.0.0 -p 3011
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```text
+http://localhost:3011/appfund
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment
 
-## Learn More
+Use local `.env` for development and production environment variables on the server. Do not commit real secrets.
 
-To learn more about Next.js, take a look at the following resources:
+Required production values:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+DATABASE_URL="file:/var/lib/2startup/appfund/appfund.db"
+AUTH_SECRET="<long-random-secret>"
+INITIAL_ADMIN_EMAIL="<admin-email>"
+INITIAL_ADMIN_NAME="<admin-name>"
+INITIAL_ADMIN_PASSWORD="<temporary-bootstrap-password>"
+NEXT_PUBLIC_BASE_PATH="/appfund"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`INITIAL_ADMIN_PASSWORD` is only for first admin bootstrap when no admin exists. After first login, change the admin password and remove any temporary credential file from the server.
 
-## Deploy on Vercel
+## Database
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npx prisma generate
+npx prisma db push
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Production SQLite path:
+
+```text
+/var/lib/2startup/appfund/appfund.db
+```
+
+Keep the database outside the Git checkout and restrict permissions:
+
+```bash
+chmod 600 /var/lib/2startup/appfund/appfund.db
+```
+
+## Build Checks
+
+Run before commit/deploy:
+
+```bash
+npm run lint
+NEXT_PUBLIC_BASE_PATH=/appfund npm run build
+```
+
+Known lint warnings may appear for existing `<img>` usage. Treat new warnings as issues unless intentionally reviewed.
+
+## Production Routing
+
+AppFund runs behind Nginx and PM2:
+
+- Public URL: `https://2startup.cloud/appfund`
+- Login URL: `https://2startup.cloud/appfund/login`
+- Internal target: `http://127.0.0.1:3011`
+- PM2 process: `appfund`
+
+Nginx should keep an exact redirect for the bare app path:
+
+```nginx
+location = /appfund {
+    return 302 /appfund/login;
+}
+
+location ^~ /appfund {
+    proxy_pass http://127.0.0.1:3011;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+The application also has a server-side route guard in `src/proxy.js`. Protected routes redirect to `/appfund/login` when the `appfund_session` cookie is missing or invalid.
+
+## Production Deploy
+
+```bash
+ssh -A root@72.62.247.131
+cd /var/www/apps/appfund
+git remote set-url origin git@github.com:torpong-tang/appfund.git
+git pull --ff-only origin main
+npm ci --include=dev
+DATABASE_URL="file:/var/lib/2startup/appfund/appfund.db" npx prisma generate
+DATABASE_URL="file:/var/lib/2startup/appfund/appfund.db" npx prisma db push
+NEXT_PUBLIC_BASE_PATH=/appfund DATABASE_URL="file:/var/lib/2startup/appfund/appfund.db" npm run build
+NODE_ENV=production PORT=3011 HOSTNAME=127.0.0.1 DATABASE_URL="file:/var/lib/2startup/appfund/appfund.db" pm2 restart appfund --update-env
+pm2 save
+```
+
+If PM2 must be recreated:
+
+```bash
+NODE_ENV=production PORT=3011 HOSTNAME=127.0.0.1 DATABASE_URL="file:/var/lib/2startup/appfund/appfund.db" pm2 start .next/standalone/server.js --name appfund --cwd /var/www/apps/appfund --update-env
+pm2 save
+```
+
+## Health Checks
+
+```bash
+curl -I -s https://2startup.cloud/ | head -n 1
+curl -I -s https://2startup.cloud/appfund | head -n 5
+curl -I -s https://2startup.cloud/appfund/login | head -n 1
+curl -I -s https://2startup.cloud/appfund/members | head -n 5
+pm2 ls
+```
+
+Expected:
+
+- `https://2startup.cloud/` returns `200 OK`
+- `https://2startup.cloud/appfund` redirects to `/appfund/login`
+- `https://2startup.cloud/appfund/login` returns `200 OK`
+- protected routes without a session redirect to `/appfund/login`
+- PM2 process `appfund` is `online`
+
+## Security Notes
+
+- Keep Git remote as SSH: `git@github.com:torpong-tang/appfund.git`
+- Do not commit `.env`, SQLite DBs, backups, temporary passwords, or GitHub tokens
+- Use SSH agent forwarding during production deploy only when needed
+- Rotate exposed credentials immediately
+- Remove temporary initial admin credential files after changing the admin password
