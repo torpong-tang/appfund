@@ -66,15 +66,34 @@ chmod 600 /var/lib/2startup/appfund/appfund.db
 Run before commit/deploy:
 
 ```bash
+npm test
 npm run lint
 NEXT_PUBLIC_BASE_PATH=/appfund npm run build
+npm run test:runtime
 ```
+
+`npm test` covers request validation. `npm run test:runtime` starts the compiled
+standalone application with a temporary SQLite database and verifies login,
+session protection, API error responses, field allowlists, and transaction
+validation. It never connects to the production database.
 
 The `postbuild` script automatically copies `.next/static` and `public` into
 `.next/standalone`. These assets are required when PM2 runs the standalone
 server; do not remove this step from the production build.
 
 Known lint warnings may appear for existing `<img>` usage. Treat new warnings as issues unless intentionally reviewed.
+
+## API Safety
+
+Protected API routes return JSON `401` responses when no session exists. They
+do not redirect API clients to the HTML login page. Create and update routes
+persist only explicitly supported fields, validate record IDs and numeric
+amounts, and return generic server errors without exposing database details.
+
+The demo seed deletes existing development rows before inserting sample data.
+All seed entry points refuse to run when `NODE_ENV=production` or when the
+database points to `/var/lib/2startup/`. Never run `npm run seed` during a
+production deployment.
 
 ## Production Routing
 

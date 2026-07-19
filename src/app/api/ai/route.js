@@ -2,18 +2,14 @@ export const dynamic = "force-dynamic";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import prisma from "@/lib/prisma";
-import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { ApiError, apiErrorResponse, requireSession } from '@/lib/api-route';
 
 export async function POST(req) {
-    if (!getSessionUser(req)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
     try {
+        requireSession(req);
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
-            return NextResponse.json(
-                { error: "API Key not configured" },
-                { status: 500 }
-            );
+            throw new ApiError(503, 'AI service is not configured');
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
@@ -46,12 +42,8 @@ export async function POST(req) {
         const response = await result.response;
         const text = response.text();
 
-        return NextResponse.json({ analysis: text });
+        return Response.json({ analysis: text });
     } catch (error) {
-        console.error("AI Analysis Error:", error);
-        return NextResponse.json(
-            { error: "Failed to analyze data" },
-            { status: 500 }
-        );
+        return apiErrorResponse(error, 'AI analysis');
     }
 }

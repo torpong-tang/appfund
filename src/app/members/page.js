@@ -227,7 +227,7 @@ export default function MembersPage() {
                     <div className="flex flex-col items-center justify-center mb-6">
                         <div className="relative group cursor-pointer w-28 h-28">
                             <div className="w-full h-full rounded-full border-4 border-white/10 overflow-hidden relative z-10 bg-black/20 shadow-xl group-hover:border-teal-400/50 transition-colors">
-                                {formData.avatar ? <img src={formData.avatar} className="w-full h-full object-cover" /> : <div className="w-full h-full flex flex-col items-center justify-center text-white/30"><Camera size={24} /></div>}
+                                {formData.avatar ? <img src={formData.avatar} alt="ตัวอย่างรูปสมาชิก" className="w-full h-full object-cover" /> : <div className="w-full h-full flex flex-col items-center justify-center text-white/30"><Camera size={24} /></div>}
                             </div>
                             <input type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer z-30" />
                             <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 rounded-full transition-opacity pointer-events-none text-white"><Upload size={24} /></div>

@@ -3,16 +3,17 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyPassword, signSession, sessionCookieOptions, SESSION_COOKIE, ensureDefaultAdmin } from '@/lib/auth';
+import { ApiError, apiErrorResponse, readJsonObject } from '@/lib/api-route';
 
 export async function POST(request) {
     try {
         await ensureDefaultAdmin();
-        const { email, password } = await request.json();
-        if (!email || !password) {
-            return NextResponse.json({ error: "กรุณากรอกอีเมลและรหัสผ่าน" }, { status: 400 });
-        }
+        const body = await readJsonObject(request);
+        const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+        const password = typeof body.password === 'string' ? body.password : '';
+        if (!email || !password) throw new ApiError(400, 'กรุณากรอกอีเมลและรหัสผ่าน');
 
-        const user = await prisma.adminUser.findUnique({ where: { email: String(email).trim().toLowerCase() } });
+        const user = await prisma.adminUser.findUnique({ where: { email } });
         if (!user || !verifyPassword(password, user.passwordHash)) {
             return NextResponse.json({ error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" }, { status: 401 });
         }
@@ -22,6 +23,6 @@ export async function POST(request) {
         res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions);
         return res;
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiErrorResponse(error, 'Admin login');
     }
 }

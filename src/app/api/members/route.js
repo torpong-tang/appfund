@@ -1,15 +1,14 @@
 export const dynamic = "force-dynamic";
 
-import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSessionUser } from '@/lib/auth';
+import { apiErrorResponse, readJsonObject, requireSession } from '@/lib/api-route';
+import { validateMember } from '@/lib/api-validation';
 
 export async function GET(request) {
-    if (!getSessionUser(request)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
-    const { searchParams } = new URL(request.url);
-    const search = searchParams.get('search') || '';
-
     try {
+        requireSession(request);
+        const { searchParams } = new URL(request.url);
+        const search = (searchParams.get('search') || '').trim().slice(0, 200);
         const members = await prisma.member.findMany({
             where: search ? {
                 OR: [
@@ -21,21 +20,21 @@ export async function GET(request) {
             } : undefined,
             orderBy: { createdAt: 'desc' }
         });
-        return NextResponse.json(members);
+        return Response.json(members);
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiErrorResponse(error, 'List members');
     }
 }
 
 export async function POST(request) {
-    if (!getSessionUser(request)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
     try {
-        const json = await request.json();
+        requireSession(request);
+        const body = await readJsonObject(request);
         const member = await prisma.member.create({
-            data: json
+            data: validateMember(body)
         });
-        return NextResponse.json(member);
+        return Response.json(member, { status: 201 });
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiErrorResponse(error, 'Create member');
     }
 }

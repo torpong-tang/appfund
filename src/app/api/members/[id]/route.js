@@ -1,47 +1,47 @@
 export const dynamic = "force-dynamic";
 
-import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSessionUser } from '@/lib/auth';
+import { apiErrorResponse, parseId, readJsonObject, requireSession } from '@/lib/api-route';
+import { validateMember } from '@/lib/api-validation';
 
 export async function GET(request, { params }) {
-    if (!getSessionUser(request)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
-    const { id } = await params;
     try {
+        requireSession(request);
+        const id = parseId((await params).id);
         const member = await prisma.member.findUnique({
-            where: { id: parseInt(id) }
+            where: { id }
         });
-        if (!member) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-        return NextResponse.json(member);
+        if (!member) return Response.json({ error: 'Record not found' }, { status: 404 });
+        return Response.json(member);
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiErrorResponse(error, 'Get member');
     }
 }
 
 export async function PUT(request, { params }) {
-    if (!getSessionUser(request)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
-    const { id } = await params;
     try {
-        const json = await request.json();
+        requireSession(request);
+        const id = parseId((await params).id);
+        const body = await readJsonObject(request);
         const member = await prisma.member.update({
-            where: { id: parseInt(id) },
-            data: json
+            where: { id },
+            data: validateMember(body, { partial: true })
         });
-        return NextResponse.json(member);
+        return Response.json(member);
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiErrorResponse(error, 'Update member');
     }
 }
 
 export async function DELETE(request, { params }) {
-    if (!getSessionUser(request)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
-    const { id } = await params;
     try {
+        requireSession(request);
+        const id = parseId((await params).id);
         await prisma.member.delete({
-            where: { id: parseInt(id) }
+            where: { id }
         });
-        return NextResponse.json({ success: true });
+        return Response.json({ success: true });
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiErrorResponse(error, 'Delete member');
     }
 }

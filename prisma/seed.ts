@@ -2,6 +2,11 @@
 import { PrismaClient } from '../src/generated/prisma/client.ts';
 import path from 'node:path';
 
+if (process.env.NODE_ENV === 'production') {
+    console.error('Refusing to seed a production AppFund database.');
+    process.exit(1);
+}
+
 // Set environment variable explicitly for the process
 const dbPath = path.resolve(process.cwd(), 'prisma/dev.db');
 process.env.DATABASE_URL = `file:${dbPath}`;

@@ -8,6 +8,8 @@
     "postbuild": "node scripts/prepare-standalone.mjs",
     "start": "next start",
     "lint": "eslint",
+    "test": "node --experimental-default-type=module --test tests/*.test.js",
+    "test:runtime": "node scripts/runtime-smoke.mjs",
     "seed": "node prisma/seed.js"
   },
   "prisma": {

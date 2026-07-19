@@ -1,5 +1,11 @@
 import { PrismaClient } from '../src/generated/prisma/client.ts';
 
+const databaseUrl = process.env.DATABASE_URL || '';
+if (process.env.NODE_ENV === 'production' || databaseUrl.includes('/var/lib/2startup/')) {
+    console.error('Refusing to seed a production AppFund database.');
+    process.exit(1);
+}
+
 const prisma = new PrismaClient();
 
 async function main() {

@@ -1,12 +1,11 @@
 export const dynamic = "force-dynamic";
 
-import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSessionUser } from '@/lib/auth';
+import { apiErrorResponse, requireSession } from '@/lib/api-route';
 
 export async function GET(request) {
-    if (!getSessionUser(request)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
     try {
+        requireSession(request);
         const income = await prisma.transaction.aggregate({
             _sum: { income: true }
         });
@@ -21,7 +20,7 @@ export async function GET(request) {
             where: { income: { gt: 0 } }
         });
 
-        return NextResponse.json({
+        return Response.json({
             income: income._sum.income || 0,
             expense: expense._sum.expense || 0,
             members: memberStats.map(m => ({
@@ -30,6 +29,6 @@ export async function GET(request) {
             }))
         });
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiErrorResponse(error, 'Load dashboard statistics');
     }
 }

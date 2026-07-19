@@ -12,7 +12,9 @@ function normalizeAppPath(pathname) {
 
 export function proxy(request) {
   const appPath = normalizeAppPath(request.nextUrl.pathname);
-  const isPublicApi = PUBLIC_API_PREFIXES.some((prefix) => appPath.startsWith(prefix));
+  const isPublicApi = PUBLIC_API_PREFIXES.some(
+    (prefix) => appPath === prefix || appPath.startsWith(`${prefix}/`),
+  );
 
   if (PUBLIC_PATHS.has(appPath) || isPublicApi) {
     return NextResponse.next();
@@ -20,6 +22,9 @@ export function proxy(request) {
 
   const hasSession = Boolean(request.cookies.get(SESSION_COOKIE)?.value);
   if (!hasSession) {
+    if (appPath.startsWith('/api/')) {
+      return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
+    }
     return NextResponse.redirect(new URL("/appfund/login", request.url));
   }
 

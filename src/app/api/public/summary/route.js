@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
-import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { apiErrorResponse } from '@/lib/api-route';
 
 // PUBLIC (no auth): aggregate fund summary shown on the landing page.
 // Exposes only totals + goal + branding — no member or transaction details.
@@ -37,7 +37,7 @@ export async function GET() {
             .filter(c => c.memberId) // only those with a student id
             .sort((a, b) => b.total - a.total);
 
-        return NextResponse.json({
+        return Response.json({
             contributors,
             income,
             expense,
@@ -50,6 +50,6 @@ export async function GET() {
             subtitle: setting.subtitle,
         });
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiErrorResponse(error, 'Load public fund summary');
     }
 }

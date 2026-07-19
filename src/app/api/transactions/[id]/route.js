@@ -1,32 +1,31 @@
 export const dynamic = "force-dynamic";
 
-import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSessionUser } from '@/lib/auth';
+import { apiErrorResponse, parseId, requireSession } from '@/lib/api-route';
 
 export async function GET(request, { params }) {
-    if (!getSessionUser(request)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
-    const { id } = await params;
     try {
+        requireSession(request);
+        const id = parseId((await params).id);
         const tx = await prisma.transaction.findUnique({
-            where: { id: parseInt(id) }
+            where: { id }
         });
-        if (!tx) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-        return NextResponse.json(tx);
+        if (!tx) return Response.json({ error: 'Record not found' }, { status: 404 });
+        return Response.json(tx);
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiErrorResponse(error, 'Get transaction');
     }
 }
 
 export async function DELETE(request, { params }) {
-    if (!getSessionUser(request)) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
-    const { id } = await params;
     try {
+        requireSession(request);
+        const id = parseId((await params).id);
         await prisma.transaction.delete({
-            where: { id: parseInt(id) }
+            where: { id }
         });
-        return NextResponse.json({ success: true });
+        return Response.json({ success: true });
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiErrorResponse(error, 'Delete transaction');
     }
 }
